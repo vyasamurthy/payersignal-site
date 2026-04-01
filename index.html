@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PayerSignal™ — Payer-Native Drug Safety Intelligence</title>
+<meta name="description" content="The only pharmacovigilance platform built for payers. Real-time drug safety signals from your own claims data. HEOR evidence in 60 seconds."/>
+<meta property="og:title" content="PayerSignal™ — Payer-Native Drug Safety Intelligence"/>
+<meta property="og:description" content="Turn your claims data into HEOR evidence. NNH. Budget impact. AMCP dossier. In 60 seconds."/>
+<meta property="og:image" content="https://payersignal.ai/og.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #050c14;
+  --bg2:     #081018;
+  --surface: #0a1624;
+  --raised:  #0f1e2e;
+  --border:  #132033;
+  --border2: #1a2d45;
+  --teal:    #3b9eff;
+  --tealDim: #3b9eff44;
+  --tealBg:  #3b9eff0a;
+  --blue:    #3b9eff;
+  --blueDim: #3b9eff44;
+  --blueBg:  #3b9eff0a;
+  --purple:  #a855f7;
+  --amber:   #f59e0b;
+  --red:     #ef4444;
+  --text:    #e8f4ff;
+  --textMid: #8ba8c4;
+  --textDim: #4a6480;
+  --mono:    'JetBrains Mono', monospace;
+  --serif:   'DM Serif Display', Georgia, serif;
+  --sans:    'DM Sans', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── Grid bg ──────────────────────────────────────────────────────────────── */
+.grid-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.35;
+}
+.noise {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+.glow-orb {
+  position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
+}
+.glow-1 { width: 600px; height: 600px; background: #3b9eff15; top: -200px; left: -100px; }
+.glow-2 { width: 500px; height: 500px; background: #a855f710; top: 40%; right: -150px; }
+.glow-3 { width: 400px; height: 400px; background: #3b9eff08; bottom: 10%; left: 20%; }
+
+/* ── Nav ──────────────────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 60px;
+  background: #050c14cc;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-logo-mark {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--blueBg);
+  border: 1px solid var(--blueDim);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--blue);
+}
+.nav-brand {
+  font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text);
+  letter-spacing: -0.3px;
+}
+.nav-brand span { color: var(--blue); }
+.nav-links {
+  display: flex; align-items: center; gap: 28px;
+  font-size: 12px; color: var(--textDim); font-weight: 500;
+}
+.nav-links a:hover { color: var(--text); transition: color .15s; }
+.nav-cta {
+  padding: 7px 18px; border-radius: 6px;
+  background: var(--blueBg);
+  border: 1px solid var(--blueDim);
+  color: var(--blue); font-family: var(--mono); font-size: 11px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.5px;
+  transition: all .15s;
+}
+.nav-cta:hover { background: #3b9eff18; border-color: var(--blue); }
+
+/* ── Sections ─────────────────────────────────────────────────────────────── */
+section { position: relative; z-index: 1; }
+.container { max-width: 1160px; margin: 0 auto; padding: 0 40px; }
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 120px 0 80px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--blue);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 28px;
+}
+.hero-eyebrow::before {
+  content: ''; display: block; width: 24px; height: 1px; background: var(--blue);
+}
+.hero-headline {
+  font-family: var(--serif);
+  font-size: clamp(44px, 6vw, 78px);
+  line-height: 1.08;
+  color: var(--text);
+  letter-spacing: -1.5px;
+  max-width: 820px;
+  margin-bottom: 24px;
+}
+.hero-headline em {
+  font-style: italic; color: var(--blue);
+}
+.hero-sub {
+  font-size: 17px; color: var(--textMid); max-width: 560px;
+  line-height: 1.7; margin-bottom: 40px; font-weight: 300;
+}
+.hero-ctas {
+  display: flex; gap: 12px; align-items: center; margin-bottom: 60px;
+}
+.btn-primary {
+  padding: 13px 28px; border-radius: 8px;
+  background: var(--blue); color: #050c14;
+  font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+  border: none; cursor: pointer;
+  transition: all .15s;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px #3b9eff30; }
+.btn-ghost {
+  padding: 12px 24px; border-radius: 8px;
+  background: transparent; color: var(--textMid);
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border2); cursor: pointer;
+  transition: all .15s;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--textDim); }
+
+/* Signal ticker */
+.ticker-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.ticker-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--raised);
+}
+.ticker-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--blue); animation: pulse 2s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.ticker-scroll { overflow: hidden; white-space: nowrap; padding: 0; height: 36px; display: flex; align-items: center; }
+.ticker-inner {
+  display: inline-flex; gap: 0;
+  animation: ticker 28s linear infinite;
+}
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.tick-item {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 24px;
+  font-family: var(--mono); font-size: 11px;
+  border-right: 1px solid var(--border);
+}
+.tick-drug { color: var(--text); font-weight: 600; }
+.tick-ade  { color: var(--textMid); }
+.tick-sep  { color: var(--border2); }
+.tick-cnss { font-weight: 700; }
+.tick-tier { padding: 1px 6px; border-radius: 3px; font-size: 9px; font-weight: 700; }
+.tier-mod  { background: #f59e0b20; border: 1px solid #f59e0b44; color: #f59e0b; }
+.tier-low  { background: #3b9eff15; border: 1px solid #3b9eff44; color: #3b9eff; }
+.tier-mon  { background: #4a648020; border: 1px solid #4a648044; color: #8ba8c4; }
+
+/* Hero stats row */
+.hero-stats {
+  display: flex; gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.hero-stat {
+  flex: 1; padding: 18px 20px;
+  border-right: 1px solid var(--border);
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-val {
+  font-family: var(--mono); font-size: 24px; font-weight: 700;
+  color: var(--blue); line-height: 1; margin-bottom: 4px;
+}
+.hero-stat-label { font-size: 11px; color: var(--textDim); font-family: var(--mono); letter-spacing: 0.5px; }
+
+/* ── Problem ──────────────────────────────────────────────────────────────── */
+.problem { padding: 100px 0; }
+.section-label {
+  font-family: var(--mono); font-size: 9px; color: var(--textDim);
+  letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 16px;
+}
+.section-title {
+  font-family: var(--serif); font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.12; letter-spacing: -0.8px; color: var(--text);
+  margin-bottom: 20px;
+}
+.section-title em { font-style: italic; color: var(--blue); }
+.section-sub { font-size: 16px; color: var(--textMid); max-width: 520px; line-height: 1.7; font-weight: 300; }
+.problem-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 56px;
+}
+.problem-card {
+  padding: 28px; background: var(--surface);
+}
+.problem-card:hover { background: var(--raised); transition: background .2s; }
+.problem-num {
+  font-family: var(--mono); font-size: 42px; font-weight: 700;
+  color: var(--border2); line-height: 1; margin-bottom: 16px;
+}
+.problem-card h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.problem-card p  { font-size: 13px; color: var(--textMid); line-height: 1.65; }
+
+/* ── How it works ─────────────────────────────────────────────────────────── */
+.how { padding: 100px 0; }
+.steps {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+  margin-top: 56px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+}
+.step {
+  padding: 28px 24px; background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.step:last-child { border-right: none; }
+.step-arrow {
+  position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 11px;
+  background: var(--bg); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 10px; color: var(--blue); z-index: 2;
+}
+.step:last-child .step-arrow { display: none; }
+.step-n {
+  font-family: var(--mono); font-size: 9px; color: var(--textDim); letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.step-n::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.step-icon { font-size: 22px; margin-bottom: 12px; }
+.step h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.step p  { font-size: 12px; color: var(--textMid); line-height: 1.6; }
+.step-time {
+  margin-top: 12px; font-family: var(--mono); font-size: 10px;
+  color: var(--blue); font-weight: 600;
+}
+
+/* ── Capabilities ─────────────────────────────────────────────────────────── */
+.capabilities { padding: 100px 0; }
+.cap-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 56px;
+}
+.cap-card {
+  padding: 28px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 12px;
+  transition: border-color .2s, transform .2s;
+  position: relative; overflow: hidden;
+}
+.cap-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent, var(--blue));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .3s;
+}
+.cap-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.cap-card:hover::before { transform: scaleX(1); }
+.cap-card.wide { grid-column: span 2; }
+.cap-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 3px; margin-bottom: 14px;
+}
+.cap-card h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+.cap-card p  { font-size: 13px; color: var(--textMid); line-height: 1.7; margin-bottom: 14px; }
+.cap-metrics {
+  display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.cap-metric { font-family: var(--mono); font-size: 10px; color: var(--textDim); }
+.cap-metric strong { color: var(--blue); font-size: 14px; display: block; line-height: 1; margin-bottom: 2px; }
+
+/* ── HEOR Leadership ──────────────────────────────────────────────────────── */
+.heor { padding: 100px 0; background: var(--bg2); }
+.heor-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.heor-text { }
+.heor-cards { display: flex; flex-direction: column; gap: 10px; }
+.heor-card {
+  padding: 16px 18px; background: var(--surface);
+  border: 1px solid var(--border); border-left: 3px solid var(--accent, var(--blue)); border-radius: 0 8px 8px 0;
+  cursor: default;
+  transition: background .15s;
+}
+.heor-card:hover { background: var(--raised); }
+.heor-card-top {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+}
+.heor-card-sprint {
+  font-family: var(--mono); font-size: 8px; color: var(--textDim); letter-spacing: 1px;
+}
+.heor-card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.heor-card-desc { font-size: 11px; color: var(--textMid); margin-top: 4px; }
+.heor-card-stat {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 3px; background: var(--accentBg, #3b9eff10); color: var(--accent, var(--blue));
+}
+
+/* ── Comparison ───────────────────────────────────────────────────────────── */
+.comparison { padding: 100px 0; }
+.comp-table {
+  margin-top: 48px;
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+}
+.comp-head {
+  display: grid; grid-template-columns: 240px 1fr 1fr 1fr;
+  background: var(--raised); border-bottom: 1px solid var(--border);
+}
+.comp-head-cell {
+  padding: 14px 16px; font-family: var(--mono); font-size: 10px;
+  color: var(--textDim); letter-spacing: 1px; text-transform: uppercase;
+  border-right: 1px solid var(--border);
+}
+.comp-head-cell:last-child { border-right: none; }
+.comp-head-cell.highlight {
+  color: var(--blue);
+  background: var(--blueBg);
+  border-bottom: 2px solid var(--blue);
+}
+.comp-row {
+  display: grid; grid-template-columns: 240px 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+.comp-row:last-child { border-bottom: none; }
+.comp-cell {
+  padding: 12px 16px; font-size: 12px; color: var(--textMid);
+  border-right: 1px solid var(--border);
+  display: flex; align-items: center;
+}
+.comp-cell:last-child { border-right: none; }
+.comp-cell:first-child { color: var(--text); font-weight: 500; font-size: 12px; }
+.comp-cell.highlight { background: #3b9eff06; }
+.check { color: var(--blue); font-size: 14px; }
+.cross { color: var(--textDim); font-size: 14px; }
+.partial { color: var(--amber); font-size: 14px; }
+
+/* ── Integration ──────────────────────────────────────────────────────────── */
+.integration { padding: 100px 0; }
+.int-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 48px;
+}
+.int-badge {
+  padding: 14px 12px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px;
+  text-align: center; cursor: default;
+  transition: all .2s;
+}
+.int-badge:hover { border-color: var(--border2); transform: translateY(-2px); }
+.int-icon { font-size: 20px; margin-bottom: 6px; }
+.int-name { font-family: var(--mono); font-size: 9px; color: var(--textDim); letter-spacing: 0.5px; }
+
+/* ── Social proof / numbers ───────────────────────────────────────────────── */
+.proof { padding: 80px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.proof-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+}
+.proof-item {
+  padding: 0 32px; border-right: 1px solid var(--border); text-align: center;
+}
+.proof-item:last-child { border-right: none; }
+.proof-val {
+  font-family: var(--mono); font-size: 38px; font-weight: 700;
+  color: var(--blue); line-height: 1; margin-bottom: 6px;
+}
+.proof-label { font-size: 12px; color: var(--textMid); }
+
+/* ── CTA ──────────────────────────────────────────────────────────────────── */
+.cta-section {
+  padding: 120px 0; text-align: center;
+  background: radial-gradient(ellipse 800px 400px at 50% 50%, #3b9eff08, transparent);
+}
+.cta-section .section-title { max-width: 700px; margin: 0 auto 20px; }
+.cta-section .section-sub { margin: 0 auto 40px; text-align: center; }
+.cta-form {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+}
+.cta-input {
+  padding: 12px 18px; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--text); font-family: var(--sans); font-size: 14px;
+  outline: none; width: 280px;
+  transition: border-color .15s;
+}
+.cta-input:focus { border-color: var(--blue); }
+.cta-input::placeholder { color: var(--textDim); }
+.cta-note { margin-top: 14px; font-size: 11px; color: var(--textDim); }
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+footer {
+  padding: 40px 0; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%;
+}
+.footer-left { font-family: var(--mono); font-size: 10px; color: var(--textDim); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 12px; color: var(--textDim); transition: color .15s; }
+.footer-links a:hover { color: var(--textMid); }
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { opacity: 0; animation: fadeUp .7s ease forwards; }
+.d1 { animation-delay: .1s; } .d2 { animation-delay: .2s; }
+.d3 { animation-delay: .3s; } .d4 { animation-delay: .4s; }
+.d5 { animation-delay: .5s; } .d6 { animation-delay: .6s; }
+
+/* Scroll reveal */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .container { padding: 0 20px; }
+  .hero-headline { font-size: 38px; }
+  .problem-grid, .steps, .cap-grid { grid-template-columns: 1fr; }
+  .cap-card.wide { grid-column: span 1; }
+  .heor-inner { grid-template-columns: 1fr; }
+  .comp-table { overflow-x: auto; }
+  .comp-head, .comp-row { grid-template-columns: 180px 1fr 1fr 1fr; min-width: 640px; }
+  .int-grid { grid-template-columns: repeat(3, 1fr); }
+  .proof-grid { grid-template-columns: 1fr 1fr; gap: 20px 0; }
+  .proof-item { border-right: none; padding: 20px 0; }
+  .hero-stats { flex-direction: column; }
+  .hero-stat { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="noise"></div>
+<div class="glow-orb glow-1"></div>
+<div class="glow-orb glow-2"></div>
+<div class="glow-orb glow-3"></div>
+
+<!-- ── Nav ───────────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark">PS</div>
+    <span class="nav-brand">PayerSignal<span>™</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="#capabilities">Platform</a>
+    <a href="#heor">HEOR</a>
+    <a href="#comparison">Why PayerSignal</a>
+    <a href="#integration">Integrations</a>
+    <a href="mailto:vyasa.murthy@venture-vertex.com">Contact</a>
+  </div>
+  <a href="mailto:vyasa.murthy@venture-vertex.com?subject=PayerSignal Demo Request" class="nav-cta">REQUEST DEMO →</a>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+
+    <div class="hero-eyebrow fade-up d1">Payer-Native Pharmacovigilance</div>
+
+    <h1 class="hero-headline fade-up d2">
+      Drug safety signals<br/>from <em>your own</em><br/>claims data.
+    </h1>
+
+    <p class="hero-sub fade-up d3">
+      The only pharmacovigilance platform built for payers. Real-time CNSS signal detection, ISPOR-compliant HEOR evidence, and AMCP Format 5.0 dossiers — generated in 60 seconds from your FHIR R4 endpoint.
+    </p>
+
+    <div class="hero-ctas fade-up d4">
+      <a href="mailto:vyasa.murthy@venture-vertex.com?subject=PayerSignal Demo Request" class="btn-primary">SEE A LIVE DEMO</a>
+      <a href="#capabilities" class="btn-ghost">Explore Platform →</a>
+    </div>
+
+    <!-- Live signal ticker -->
+    <div class="ticker-wrap fade-up d5">
+      <div class="ticker-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="ticker-dot"></div>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--textDim);letter-spacing:1px">LIVE SIGNAL FEED · PAYERSIGNAL™ CNSS ENGINE</span>
+        </div>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--textDim)">3,842 MEMBERS · GLP-1 CLASS · DEMO PLAN</span>
+      </div>
+      <div class="ticker-scroll">
+        <div class="ticker-inner" id="ticker">
+          <!-- Duplicated for seamless loop -->
+          <span class="tick-item"><span class="tick-drug">semaglutide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--amber)">CNSS 3.82</span><span class="tick-tier tier-mod">MODERATE</span></span>
+          <span class="tick-item"><span class="tick-drug">semaglutide</span><span class="tick-sep">›</span><span class="tick-ade">GASTROPARESIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--amber)">CNSS 3.21</span><span class="tick-tier tier-mod">MODERATE</span></span>
+          <span class="tick-item"><span class="tick-drug">tirzepatide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--blue)">CNSS 2.14</span><span class="tick-tier tier-low">LOW</span></span>
+          <span class="tick-item"><span class="tick-drug">liraglutide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--blue)">CNSS 1.88</span><span class="tick-tier tier-low">LOW</span></span>
+          <span class="tick-item"><span class="tick-drug">semaglutide</span><span class="tick-sep">›</span><span class="tick-ade">THYROID NEOPLASM</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--amber)">CNSS 2.88</span><span class="tick-tier tier-mod">MODERATE</span></span>
+          <span class="tick-item"><span class="tick-drug">atorvastatin</span><span class="tick-sep">›</span><span class="tick-ade">MYOPATHY</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--textDim)">CNSS 1.24</span><span class="tick-tier tier-mon">MONITOR</span></span>
+          <span class="tick-item"><span class="tick-drug">dulaglutide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--blue)">CNSS 1.62</span><span class="tick-tier tier-low">LOW</span></span>
+          <span class="tick-item"><span class="tick-drug">metformin</span><span class="tick-sep">›</span><span class="tick-ade">LACTIC ACIDOSIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--textDim)">CNSS 0.84</span><span class="tick-tier tier-mon">MONITOR</span></span>
+          <!-- duplicate for loop -->
+          <span class="tick-item"><span class="tick-drug">semaglutide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--amber)">CNSS 3.82</span><span class="tick-tier tier-mod">MODERATE</span></span>
+          <span class="tick-item"><span class="tick-drug">semaglutide</span><span class="tick-sep">›</span><span class="tick-ade">GASTROPARESIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--amber)">CNSS 3.21</span><span class="tick-tier tier-mod">MODERATE</span></span>
+          <span class="tick-item"><span class="tick-drug">tirzepatide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--blue)">CNSS 2.14</span><span class="tick-tier tier-low">LOW</span></span>
+          <span class="tick-item"><span class="tick-drug">liraglutide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--blue)">CNSS 1.88</span><span class="tick-tier tier-low">LOW</span></span>
+          <span class="tick-item"><span class="tick-drug">semaglutide</span><span class="tick-sep">›</span><span class="tick-ade">THYROID NEOPLASM</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--amber)">CNSS 2.88</span><span class="tick-tier tier-mod">MODERATE</span></span>
+          <span class="tick-item"><span class="tick-drug">atorvastatin</span><span class="tick-sep">›</span><span class="tick-ade">MYOPATHY</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--textDim)">CNSS 1.24</span><span class="tick-tier tier-mon">MONITOR</span></span>
+          <span class="tick-item"><span class="tick-drug">dulaglutide</span><span class="tick-sep">›</span><span class="tick-ade">PANCREATITIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--blue)">CNSS 1.62</span><span class="tick-tier tier-low">LOW</span></span>
+          <span class="tick-item"><span class="tick-drug">metformin</span><span class="tick-sep">›</span><span class="tick-ade">LACTIC ACIDOSIS</span><span class="tick-sep">|</span><span class="tick-cnss" style="color:var(--textDim)">CNSS 0.84</span><span class="tick-tier tier-mon">MONITOR</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="hero-stats fade-up d6">
+      <div class="hero-stat">
+        <div class="hero-stat-val">$1.59M</div>
+        <div class="hero-stat-label">ANNUAL ADE BURDEN · SEMAGLUTIDE/PANCREATITIS</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">NNH 133</div>
+        <div class="hero-stat-label">vs 250 PUBLISHED BENCHMARK · 47% HIGHER RISK</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">$478K</div>
+        <div class="hero-stat-label">STEP THERAPY SAVINGS · 3-YEAR BIA</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">&lt;60s</div>
+        <div class="hero-stat-label">FULL HEOR ANALYSIS FROM FHIR ENDPOINT</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Problem ────────────────────────────────────────────────────────────── -->
+<section class="problem" id="problem">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">The gap</div>
+      <h2 class="section-title">Pharmacovigilance was built<br/>for <em>pharma.</em> Not payers.</h2>
+      <p class="section-sub">Every tool in this space — Certara, IQVIA, Evidera — was built to help drug manufacturers submit evidence to you. PayerSignal generates that evidence from your own data, independently.</p>
+    </div>
+    <div class="problem-grid reveal">
+      <div class="problem-card">
+        <div class="problem-num">01</div>
+        <h3>Pharma submits. You accept.</h3>
+        <p>Traditional pharmacovigilance tools generate HEOR models that pharma submits in AMCP dossiers. Payers receive the output. They don't own the analysis, the data, or the assumptions.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02</div>
+        <h3>FAERS is population-level. Claims are yours.</h3>
+        <p>FDA FAERS signals are real but they can't tell you that your semaglutide population has a pancreatitis NNH of 133 — 47% worse than the published benchmark. Only your claims data can.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03</div>
+        <h3>P&T needs evidence in hours, not months.</h3>
+        <p>A Certara HEOR model takes 6–12 months and costs $200K–$500K. Your P&T committee meets quarterly. PayerSignal generates NNH, BIA, and AMCP dossier in under 60 seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ───────────────────────────────────────────────────────── -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">From FHIR endpoint<br/>to P&T committee memo.</h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-arrow">→</div>
+        <div class="step-n"><span>Step 01</span></div>
+        <div class="step-icon">◈</div>
+        <h3>Connect your FHIR R4</h3>
+        <p>Point PayerSignal at your FHIR R4 endpoint. OAuth2 client credentials, GCP Secret Manager. 15-minute IT integration.</p>
+        <div class="step-time">15 minutes</div>
+      </div>
+      <div class="step">
+        <div class="step-arrow">→</div>
+        <div class="step-n"><span>Step 02</span></div>
+        <div class="step-icon">◆</div>
+        <h3>CNSS signal detection</h3>
+        <p>PayerSignal extracts MedicationRequest + Condition resources, computes CNSS scores fused with FAERS PRR and literature signal strength.</p>
+        <div class="step-time">2 minutes</div>
+      </div>
+      <div class="step">
+        <div class="step-arrow">→</div>
+        <div class="step-n"><span>Step 03</span></div>
+        <div class="step-icon">⬡</div>
+        <h3>HEOR evidence layer</h3>
+        <p>NNH with 95% CI, Monte Carlo PSA, budget impact analysis, ICER benchmark alignment, NICE TA comparison. ISPOR-compliant, JMCP-publishable.</p>
+        <div class="step-time">60 seconds</div>
+      </div>
+      <div class="step">
+        <div class="step-n"><span>Step 04</span></div>
+        <div class="step-icon">✦</div>
+        <h3>P&T action</h3>
+        <p>AMCP Format 5.0 dossier, PA criteria update, step therapy protocol, natural language P&T memo — all generated by Claude Sonnet 4.</p>
+        <div class="step-time">Instant</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Capabilities ───────────────────────────────────────────────────────── -->
+<section class="capabilities" id="capabilities">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Platform capabilities</div>
+      <h2 class="section-title">Four capabilities no competitor<br/><em>combines</em> in one platform.</h2>
+    </div>
+    <div class="cap-grid reveal">
+
+      <div class="cap-card" style="--accent:var(--blue)">
+        <div class="cap-tag" style="background:var(--blueBg);border:1px solid var(--blueDim);color:var(--blue)">◆ Signal Detection</div>
+        <h3>CNSS™ — Composite National Safety Score</h3>
+        <p>Three-source signal fusion: plan claims (CNSS), FDA FAERS (PRR + chi-squared), and PubMed literature signal count. Weighted 50/30/20. Computes in 2ms per drug-ADE pair.</p>
+        <div class="cap-metrics">
+          <div class="cap-metric"><strong>13</strong> active signals</div>
+          <div class="cap-metric"><strong>2ms</strong> per query</div>
+          <div class="cap-metric"><strong>PRR 3.84</strong> semaglutide/pancreatitis</div>
+          <div class="cap-metric"><strong>892</strong> EU reports</div>
+        </div>
+      </div>
+
+      <div class="cap-card" style="--accent:var(--purple)">
+        <div class="cap-tag" style="background:#a855f710;border:1px solid #a855f744;color:var(--purple)">⟳ Monte Carlo PSA</div>
+        <h3>ISPOR-compliant probabilistic sensitivity analysis</h3>
+        <p>10,000-iteration Monte Carlo simulation across all uncertain parameters. Gamma distributions for costs, Beta for rates, Normal for utilities. Tornado diagram, CEAC at 21 WTP thresholds, NMB at $50K/$100K/$150K. JMCP-publishable under your plan's name.</p>
+        <div class="cap-metrics">
+          <div class="cap-metric"><strong>10,000</strong> iterations</div>
+          <div class="cap-metric"><strong>78.3%</strong> P(cost saving)</div>
+          <div class="cap-metric"><strong>NNH 90–240</strong> 95% CI</div>
+          <div class="cap-metric"><strong>10</strong> tornado parameters</div>
+        </div>
+      </div>
+
+      <div class="cap-card" style="--accent:var(--amber)">
+        <div class="cap-tag" style="background:#f59e0b10;border:1px solid #f59e0b44;color:var(--amber)">◎ ICER Benchmark</div>
+        <h3>Align plan findings with ICER & NICE published HTAs</h3>
+        <p>Semaglutide at $182K/QALY per ICER 2024 obesity report — above $150K threshold. Value-based price $9,930/yr vs WAC $12,048/yr. NICE TA875. Published NNH benchmarks from Prime Therapeutics. P&T committee minutes that cite independent third-party evidence.</p>
+        <div class="cap-metrics">
+          <div class="cap-metric"><strong>$182K/QALY</strong> ICER semaglutide</div>
+          <div class="cap-metric"><strong>$9,930/yr</strong> value-based price</div>
+          <div class="cap-metric"><strong>NICE TA875</strong> corroborated</div>
+          <div class="cap-metric"><strong>17.6%</strong> above VBP</div>
+        </div>
+      </div>
+
+      <div class="cap-card" style="--accent:var(--blue)">
+        <div class="cap-tag" style="background:#3b9eff10;border:1px solid #3b9eff44;color:var(--blue)">✦ NLQ Engine</div>
+        <h3>Ask your formulary anything in plain English</h3>
+        <p>Two-pass Claude Sonnet 4 architecture. Type "Which GLP-1 drugs have pancreatitis signals above MODERATE with EU corroboration?" and receive a P&T committee memo in 4 seconds. No SQL. No dashboards. No training required.</p>
+        <div class="cap-metrics">
+          <div class="cap-metric"><strong>4s</strong> to P&T memo</div>
+          <div class="cap-metric"><strong>0</strong> SQL required</div>
+          <div class="cap-metric"><strong>Claude Sonnet 4</strong></div>
+          <div class="cap-metric"><strong>58</strong> live endpoints</div>
+        </div>
+      </div>
+
+      <div class="cap-card wide" style="--accent:var(--blue)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center">
+          <div>
+            <div class="cap-tag" style="background:var(--blueBg);border:1px solid var(--blueDim);color:var(--blue)">◈ Formulary Tier + PA Context</div>
+            <h3>PA safety check with live formulary intelligence</h3>
+            <p>Without PayerSignal: "FLAG FOR REVIEW." With PayerSignal: "Semaglutide is T3-PA at UHG. Step therapy: metformin (90 days, HbA1c ≥7.0%) → dulaglutide (90 days) → requested drug. PA criteria: lipase/amylase at baseline. Bypass criteria: documented pancreatitis history, MEN2, medullary thyroid carcinoma."</p>
+            <p style="margin-top:12px">That's an operationally deployable PA protocol generated in under 1 second. Updated from live FHIR MedicationKnowledge resources. 15 payers pre-seeded.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:0 6px 6px 0">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--amber);margin-bottom:4px">WITHOUT PAYERSIGNAL</div>
+              <div style="font-size:12px;color:var(--textDim)">FLAG_FOR_REVIEW — semaglutide pancreatitis signal detected</div>
+            </div>
+            <div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--blue)">↓ PayerSignal enrichment</div>
+            <div style="padding:10px 14px;background:var(--blueBg);border:1px solid var(--blueDim);border-left:3px solid var(--blue);border-radius:0 6px 6px 0">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--blue);margin-bottom:4px">WITH PAYERSIGNAL</div>
+              <div style="font-size:11px;color:var(--text);line-height:1.6">
+                <strong>T3-PA</strong> · Step therapy required<br/>
+                Step 1: metformin ≥90 days<br/>
+                Step 2: dulaglutide ≥90 days<br/>
+                PA: HbA1c ≥7.0% · lipase at baseline<br/>
+                Bypass: prior pancreatitis · MEN2
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── HEOR Leadership ─────────────────────────────────────────────────────── -->
+<section class="heor" id="heor">
+  <div class="container">
+    <div class="heor-inner">
+      <div class="heor-text reveal">
+        <div class="section-label">HEOR leadership</div>
+        <h2 class="section-title">Evidence that P&T<br/>committees <em>cite.</em></h2>
+        <p style="font-size:15px;color:var(--textMid);line-height:1.7;margin-top:16px;font-weight:300">
+          Every HEOR output from PayerSignal follows ISPOR Good Practices, AMCP Format 5.0, and Drummond et al. methodology. A P&T pharmacist can submit the PSA output as a study to JMCP under the plan's name.
+        </p>
+        <p style="font-size:15px;color:var(--textMid);line-height:1.7;margin-top:12px;font-weight:300">
+          That publication is the reference case that brings in the next 10 payers.
+        </p>
+        <div style="margin-top:28px;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--textDim);letter-spacing:1px;margin-bottom:8px">SEMAGLUTIDE · PANCREATITIS · 500K-MEMBER PLAN</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--blue);line-height:1">$1.59M</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--textDim);margin-top:2px">ANNUAL ECONOMIC BURDEN</div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--red);line-height:1">NNH 133</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--textDim);margin-top:2px">vs 250 PUBLISHED · 47% HIGHER</div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--amber);line-height:1">78.3%</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--textDim);margin-top:2px">P(COST SAVING) · MONTE CARLO</div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--purple);line-height:1">$4.2M</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--textDim);margin-top:2px">NMB AT $150K WTP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="heor-cards reveal">
+        <div class="heor-card" style="--accent:var(--purple)">
+          <div class="heor-card-top">
+            <span class="heor-card-sprint">SPRINT S23</span>
+            <span class="heor-card-stat" style="--accent:var(--purple);--accentBg:#a855f710">10,000 ITERATIONS</span>
+          </div>
+          <div class="heor-card-title">Monte Carlo PSA</div>
+          <div class="heor-card-desc">Beta/Gamma/Normal distributions. CEAC at 21 WTP thresholds. Tornado diagram. Best/base/worst scenarios. Per ISPOR Good Practices (Briggs et al.).</div>
+        </div>
+        <div class="heor-card" style="--accent:var(--amber)">
+          <div class="heor-card-top">
+            <span class="heor-card-sprint">SPRINT S24</span>
+            <span class="heor-card-stat" style="--accent:var(--amber);--accentBg:#f59e0b10">ICER + NICE</span>
+          </div>
+          <div class="heor-card-title">HTA Benchmark Alignment</div>
+          <div class="heor-card-desc">ICER $/QALY, value-based price, NICE technology appraisal numbers. Negotiation leverage statements. P&T committee citations with direct links to ICER and NICE reports.</div>
+        </div>
+        <div class="heor-card" style="--accent:var(--blue)">
+          <div class="heor-card-top">
+            <span class="heor-card-sprint">SPRINT S25</span>
+            <span class="heor-card-stat" style="--accent:var(--blue);--accentBg:#3b9eff10">CLAUDE SONNET 4</span>
+          </div>
+          <div class="heor-card-title">Natural Language Querying</div>
+          <div class="heor-card-desc">Ask your formulary anything. Two-pass Claude NLQ → structured filter → narrative synthesis. P&T memo in 4 seconds. No SQL, no dashboards, no training.</div>
+        </div>
+        <div class="heor-card" style="--accent:var(--blue)">
+          <div class="heor-card-top">
+            <span class="heor-card-sprint">SPRINT S26</span>
+            <span class="heor-card-stat">FHIR R4 LIVE</span>
+          </div>
+          <div class="heor-card-title">Formulary Tier + PA Intelligence</div>
+          <div class="heor-card-desc">Live formulary tier from FHIR MedicationKnowledge. Step therapy protocol. PA approval language auto-generated. 15 payers pre-seeded. Updates in real-time from Da Vinci Drug Formulary IG.</div>
+        </div>
+        <div class="heor-card" style="--accent:var(--blue)">
+          <div class="heor-card-top">
+            <span class="heor-card-sprint">AMCP FORMAT 5.0</span>
+            <span class="heor-card-stat">7 SECTIONS</span>
+          </div>
+          <div class="heor-card-title">AMCP Dossier Generator</div>
+          <div class="heor-card-desc">Full 7-section AMCP Format 5.0 dossier generated in under 60 seconds. Clinical evidence, HEOR evidence, budget impact, comparative effectiveness, safety, appendices. Ready for P&T submission.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Comparison ─────────────────────────────────────────────────────────── -->
+<section class="comparison" id="comparison">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Why PayerSignal</div>
+      <h2 class="section-title">The only platform built<br/>for the <em>payer side</em> of pharmacovigilance.</h2>
+    </div>
+    <div class="comp-table reveal">
+      <div class="comp-head">
+        <div class="comp-head-cell">Capability</div>
+        <div class="comp-head-cell">Certara / Evidera</div>
+        <div class="comp-head-cell">MMIT / Norstella</div>
+        <div class="comp-head-cell highlight">PayerSignal™</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">Signal detection from payer claims</div>
+        <div class="comp-cell"><span class="cross">✗</span> Pharma-side only</div>
+        <div class="comp-cell"><span class="cross">✗</span> No signal detection</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> CNSS™ from FHIR claims</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">HEOR modeling (NNH, BIA, ICER)</div>
+        <div class="comp-cell"><span class="partial">◐</span> 6–12 months, $200K+</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not available</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> 60 seconds, included</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">Monte Carlo PSA (ISPOR-compliant)</div>
+        <div class="comp-cell"><span class="partial">◐</span> Manual Excel models</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not available</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> 10,000 iterations live</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">ICER / NICE benchmark alignment</div>
+        <div class="comp-cell"><span class="cross">✗</span> Pharma positioning only</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not available</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> Automated, with VBP</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">FHIR R4 real-time connectivity</div>
+        <div class="comp-cell"><span class="cross">✗</span> SFTP data extracts</div>
+        <div class="comp-cell"><span class="partial">◐</span> Formulary data only</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> 15 payers, SMART OAuth2</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">PA safety check (&lt;500ms)</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not a PA tool</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not available</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> Redis cache, &lt;50ms</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">Natural language querying</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not available</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not available</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> Claude Sonnet 4, 4s</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">AMCP Format 5.0 dossier</div>
+        <div class="comp-cell"><span class="partial">◐</span> Pharma submits TO payer</div>
+        <div class="comp-cell"><span class="cross">✗</span> Not available</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> Generated in 60s</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell">Multi-tenant SaaS / GCP Marketplace</div>
+        <div class="comp-cell"><span class="cross">✗</span> Consulting engagement</div>
+        <div class="comp-cell"><span class="partial">◐</span> SaaS, limited API</div>
+        <div class="comp-cell highlight"><span class="check">✓</span> GCP Cloud Run, RLS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Proof numbers ──────────────────────────────────────────────────────── -->
+<section class="proof">
+  <div class="container">
+    <div class="proof-grid reveal">
+      <div class="proof-item">
+        <div class="proof-val">58</div>
+        <div class="proof-label">Live API endpoints, 0 stubs</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-val">15</div>
+        <div class="proof-label">Payer FHIR connectors pre-built</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-val">529</div>
+        <div class="proof-label">FAERS cases processed</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-val">&lt;500ms</div>
+        <div class="proof-label">PA safety check SLA (p95)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Integration ────────────────────────────────────────────────────────── -->
+<section class="integration" id="integration">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Integrations</div>
+      <h2 class="section-title">Connects to your existing<br/><em>infrastructure.</em></h2>
+      <p class="section-sub" style="margin-top:12px">No new data warehouse. No SFTP extracts. Connect via FHIR R4 in 15 minutes. Deploy on GCP in one command.</p>
+    </div>
+    <div class="int-grid reveal">
+      <div class="int-badge"><div class="int-icon">☁</div><div class="int-name">GCP CLOUD RUN</div></div>
+      <div class="int-badge"><div class="int-icon">⚡</div><div class="int-name">FHIR R4</div></div>
+      <div class="int-badge"><div class="int-icon">🔑</div><div class="int-name">AUTH0</div></div>
+      <div class="int-badge"><div class="int-icon">🗄</div><div class="int-name">POSTGRESQL 15</div></div>
+      <div class="int-badge"><div class="int-icon">⚙</div><div class="int-name">REDIS</div></div>
+      <div class="int-badge"><div class="int-icon">◈</div><div class="int-name">UHG FHIR</div></div>
+      <div class="int-badge"><div class="int-icon">◈</div><div class="int-name">ANTHEM FHIR</div></div>
+      <div class="int-badge"><div class="int-icon">◈</div><div class="int-name">CIGNA FHIR</div></div>
+      <div class="int-badge"><div class="int-icon">◈</div><div class="int-name">AETNA FHIR</div></div>
+      <div class="int-badge"><div class="int-icon">◈</div><div class="int-name">CMS BLUE BUTTON</div></div>
+      <div class="int-badge"><div class="int-icon">◈</div><div class="int-name">BCBS PLANS</div></div>
+      <div class="int-badge"><div class="int-icon">⬡</div><div class="int-name">EVICORE PA</div></div>
+      <div class="int-badge"><div class="int-icon">⬡</div><div class="int-name">AVAILITY PA</div></div>
+      <div class="int-badge"><div class="int-icon">✦</div><div class="int-name">CLAUDE SONNET 4</div></div>
+      <div class="int-badge"><div class="int-icon">🔒</div><div class="int-name">SECRET MANAGER</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────────────── -->
+<section class="cta-section" id="contact">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label" style="text-align:center;justify-content:center;display:flex">Get started</div>
+      <h2 class="section-title">See your formulary's<br/><em>real</em> signal profile.</h2>
+      <p class="section-sub">We'll connect to your FHIR R4 endpoint, run PayerSignal against your actual population, and show you your NNH, burden, and ICER benchmark in a live 30-minute session.</p>
+      <div class="cta-form">
+        <input class="cta-input" type="email" placeholder="your.name@healthplan.com" id="demo-email"/>
+        <a href="mailto:vyasa.murthy@venture-vertex.com?subject=PayerSignal Demo Request" class="btn-primary" onclick="handleDemo()" style="padding:12px 28px">REQUEST LIVE DEMO →</a>
+      </div>
+      <div class="cta-note">No data sharing required for the initial session · HIPAA-compliant · Runs against synthetic population if preferred</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div style="font-size:12px;color:var(--textMid);margin-bottom:4px;font-family:var(--mono);font-weight:700">PayerSignal™</div>
+        <div>© 2026 Venture Vertex LLC · Dallas, TX · payersignal.ai</div>
+        <div style="margin-top:2px">Built on GCP · FHIR R4 · Claude Sonnet 4 · HIPAA-ready</div>
+      </div>
+      <div class="footer-links">
+        <a href="#capabilities">Platform</a>
+        <a href="#heor">HEOR</a>
+        <a href="#comparison">Compare</a>
+        <a href="mailto:vyasa.murthy@venture-vertex.com">vyasa.murthy@venture-vertex.com</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Demo CTA
+function handleDemo() {
+  const email = document.getElementById('demo-email').value;
+  if (email) {
+    window.location.href = `mailto:vyasa.murthy@venture-vertex.com?subject=PayerSignal Demo Request&body=Demo request from: ${email}`;
+  }
+}
+
+// Nav scroll effect
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.borderBottomColor = window.scrollY > 40 ? 'var(--border2)' : 'var(--border)';
+});
+</script>
+</body>
+</html>
