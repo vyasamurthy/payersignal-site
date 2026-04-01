@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://payersignal.ai/sitemap.xml
+
+# Block common junk paths
+Disallow: /api/
+Disallow: /.env
+Disallow: /admin/
